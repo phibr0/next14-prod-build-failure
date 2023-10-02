@@ -3,20 +3,31 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "npm-run-all -l build:temporal --parallel dev:temporal dev:next start:worker",
+    "dev:next": "next dev",
+    "dev:temporal": "tsc --build --watch ./temporal/tsconfig.json",
+    "build:next": "next build",
+    "build:temporal": "tsc --build ./temporal/tsconfig.json",
+    "build": "npm-run-all -l build:temporal build:next",
+    "start": "npm run dev",
+    "start:worker": "nodemon ./temporal/lib/worker"
   },
   "dependencies": {
+    "@temporalio/activity": "^1.8.6",
+    "@temporalio/client": "^1.8.6",
+    "@temporalio/worker": "^1.8.6",
+    "@temporalio/workflow": "^1.8.6",
+    "next": "latest",
     "react": "latest",
-    "react-dom": "latest",
-    "next": "latest"
+    "react-dom": "latest"
   },
   "devDependencies": {
-    "typescript": "latest",
-    "@types/react": "latest",
+    "@tsconfig/node16": "^16.1.1",
     "@types/node": "latest",
-    "@types/react-dom": "latest"
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "nodemon": "^3.0.1",
+    "npm-run-all": "^4.1.5",
+    "typescript": "latest"
   }
 }
