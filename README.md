@@ -1,10 +1,13 @@
 # Production Build Failure in Next.js 14 with Temporal
 
+https://github.com/vercel/next.js/issues/58870
+
 ## Overview:
 
 Projects using Temporal experience production build failures after updating to
-Next.js 14. This issue was previously observed between Next.js versions 13.4.x
-and 13.5.4 but then recovered.
+Next.js 14.
+
+Issue was observed between `v13.4.20-canary.19` and `v13.5.4-canary.8`, again failing since `v14.0.2-canary.19`. See [results.csv](./results.csv)
 
 ## Symptoms:
 
