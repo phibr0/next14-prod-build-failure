@@ -1,3 +1,7 @@
+import { parse } from 'json2csv';
+
+const results = [];
+
 let i = 1;
 while (true) {
   const res = await fetch(
@@ -6,19 +10,24 @@ while (true) {
   const releases = await res.json();
 
   for (const release of releases) {
-    const install = Bun.spawnSync([
-      'pnpm',
-      'i',
-      `next@${release.tag_name.slice(1)}`,
-    ]);
-    await install.exited;
+    Bun.spawnSync(['pnpm', 'i', `next@${release.tag_name.slice(1)}`]);
 
-    const build = Bun.spawnSync(['pnpm', 'build']);
-    await build.exited;
-    if (build.exitCode === 0) {
+    const { exitCode } = Bun.spawnSync(['pnpm', 'build']);
+    if (exitCode === 0) {
       console.log(`\x1b[32mWorking in ${release.tag_name}\x1b[0m`);
+      results.push({
+        release: release.tag_name,
+        status: 'success',
+      });
     } else {
       console.log(`\x1b[31mFailing in ${release.tag_name}\x1b[0m`);
+      results.push({
+        release: release.tag_name,
+        status: 'fail',
+      });
     }
+
+    const csv = parse(results, {});
+    await Bun.write('results.csv', csv);
   }
 }
