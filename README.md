@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Production Build Failure in Next.js 14 with Temporal
 
-## Getting Started
+## Overview:
 
-First, run the development server:
+Projects using Temporal experience production build failures after updating to
+Next.js 14. This issue was previously observed between Next.js versions 13.4.x
+and 13.5.4 but then recovered.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Symptoms:
+
+- The project compiles and typechecks successfully.
+- An error occurs during the collection of page data in production builds.
+
+## Error encountered:
+
+```
+TypeError: Cannot read properties of undefined (reading 'api')
+    at 3290 (/xxx/.next/server/app/api/route.js:35:50001)
+    at t (/xxx/.next/server/webpack-runtime.js:1:128)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Observations:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- The issue does not appear in Next.js 13.5.6.
+- Development builds and builds using Turbopack
+  (`next build --experimental-turbopack`) function normally.
+- The problem seems related to webpack.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Reproduce:
 
-## Learn More
+### Prod builds
 
-To learn more about Next.js, take a look at the following resources:
+1. Run `pnpm compare`
+   - This command will first install next@13.5.6 and perform a build.
+   - Then, it attempts to build using next@latest and next@canary versions to
+     compare the outcomes.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Dev builds
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+1. `pnpm i`
+2. [Install Temporal](https://learn.temporal.io/getting_started/typescript/dev_environment/#set-up-a-local-temporal-development-cluster)
+3. `temporal server start-dev`
+4. (in another terminal) `pnpm dev`
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+This will start the next dev server and uses tsc in watch mode to rebuild the
+worker.
