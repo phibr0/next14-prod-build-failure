@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextConfig = {
+  swcMinify: !process.env.DISABLE_SWC_MINIFY,
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
